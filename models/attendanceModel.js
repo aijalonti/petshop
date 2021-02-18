@@ -43,6 +43,32 @@ class Attendance {
       });
     }
   }
+
+  list(res) {
+    const sql = "SELECT * FROM Attendance";
+
+    connection.query(sql, (erro, results) => {
+      if (erro) {
+        res.status(400).json(erro);
+      } else {
+        res.status(200).json(results);
+      }
+    });
+  }
+
+  searchId(id, res){
+      const sql = `SELECT * FROM Attendance WHERE id=${id}`;
+      connection.query(sql, (erro, result) => {
+          const attendance = result[0]
+          if(erro){
+              res.status(400).json(erro);
+            }else{
+                res.status(200).json(attendance);
+            }
+      })
+  }
+
+
 }
 
 module.exports = new Attendance();
