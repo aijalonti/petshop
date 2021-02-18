@@ -1,4 +1,5 @@
 const moment = require("moment");
+const attendance = require("../controllers/attendance");
 const connection = require("../infra/bd");
 
 class Attendance {
@@ -34,11 +35,11 @@ class Attendance {
 
       const sql = "INSERT INTO Attendance SET ?";
 
-      connection.query(sql, attendanceDate, (erro, results) => {
-        if (erro) {
-          res.status(400).json(erro);
+      connection.query(sql, attendanceDate, (err) => {
+        if (err) {
+          res.status(400).json(err);
         } else {
-          res.status(201).json(results);
+          res.status(201).json(attendance);
         }
       });
     }
@@ -47,43 +48,55 @@ class Attendance {
   list(res) {
     const sql = "SELECT * FROM Attendance";
 
-    connection.query(sql, (erro, results) => {
-      if (erro) {
-        res.status(400).json(erro);
+    connection.query(sql, (err, results) => {
+      if (err) {
+        res.status(400).json(err);
       } else {
         res.status(200).json(results);
       }
     });
   }
 
-  searchId(id, res){
-      const sql = `SELECT * FROM Attendance WHERE id=${id}`;
-      connection.query(sql, (erro, result) => {
-          const attendance = result[0]
-          if(erro){
-              res.status(400).json(erro);
-            }else{
-                res.status(200).json(attendance);
-            }
-      })
+  searchId(id, res) {
+    const sql = `SELECT * FROM Attendance WHERE id=${id}`;
+    connection.query(sql, (err, result) => {
+      const attendance = result[0];
+      if (err) {
+        res.status(400).json(err);
+      } else {
+        res.status(200).json(attendance);
+      }
+    });
   }
 
   update(id, values, res) {
-      if(values.dateService) {
-          values.dateService = moment(values.dateService, "DD/MM/YYYY").format("YYYY-MM-DD HH:MM:SS")
-      }
-      const sql = 'UPDATE Attendance SET ? WHERE id=?'
+    if (values.dateService) {
+      values.dateService = moment(values.dateService, "DD/MM/YYYY").format(
+        "YYYY-MM-DD HH:MM:SS"
+      );
+    }
+    const sql = "UPDATE Attendance SET ? WHERE id=?";
 
-      connection.query(sql, [values, id], (erro,results) => {
-          if(erro) {
-              res.status(400).json(erro)
-          }else{
-              res.status(200).json(results)
-          }
-      })
+    connection.query(sql, [values, id], (err) => {
+      if (err) {
+        res.status(400).json(err);
+      } else {
+        res.status(200).json(`Clinte Alterado com sucesso ${...values, id}`);
+      }
+    });
   }
 
+  delete(id, res) {
+    const sql = "DELETE FROM Attendance WHERE id=?";
 
+    connection.query(sql, id, (err) => {
+      if (err) {
+        res.status(400).json(erro);
+      } else {
+        res.status(200).json(`Cliente com id: ${id} foi removido com sucesso`);
+      }
+    });
+  }
 }
 
 module.exports = new Attendance();
