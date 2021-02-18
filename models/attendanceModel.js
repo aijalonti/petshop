@@ -2,7 +2,7 @@ const moment = require('moment')
 const connection = require('../infra/bd')
 
 class Attendance {
-    create(attendance){
+    create(attendance, res){
         const createAt = moment().format('YYYY-MM-DD HH:MM:SS')
         const dateService = moment(attendance.dateService, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS')
         const attendanceDate = {...attendance, createAt, dateService}
@@ -10,9 +10,9 @@ class Attendance {
         
         connection.query(sql, attendanceDate, (erro, results) =>{
             if(erro) {
-                console.log(erro)
+                res.status(400).json(erro)
             }else{
-                console.log(results)
+                res.status(201).json(results)
             }
         })
    
