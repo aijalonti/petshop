@@ -68,6 +68,21 @@ class Attendance {
       })
   }
 
+  update(id, values, res) {
+      if(values.dateService) {
+          values.dateService = moment(values.dateService, "DD/MM/YYYY").format("YYYY-MM-DD HH:MM:SS")
+      }
+      const sql = 'UPDATE Attendance SET ? WHERE id=?'
+
+      connection.query(sql, [values, id], (erro,results) => {
+          if(erro) {
+              res.status(400).json(erro)
+          }else{
+              res.status(200).json(results)
+          }
+      })
+  }
+
 
 }
 
