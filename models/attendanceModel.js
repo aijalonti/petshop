@@ -81,7 +81,7 @@ class Attendance {
       if (err) {
         res.status(400).json(err);
       } else {
-        res.status(200).json(`Clinte Alterado com sucesso ${...values, id}`);
+        res.status(200).json("Custumer update with sucess ${...values, id}");
       }
     });
   }
@@ -93,7 +93,9 @@ class Attendance {
       if (err) {
         res.status(400).json(erro);
       } else {
-        res.status(200).json(`Cliente com id: ${id} foi removido com sucesso`);
+        res
+          .status(200)
+          .json(`Custumer with id: ${id} has been successfully removed`);
       }
     });
   }
