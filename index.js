@@ -1,6 +1,6 @@
 const customExpress = require("./config/customExpress");
-const connection = require("./infra/bd");
-const Tables = require("./infra/tables");
+const connection = require("./infra/database/bd");
+const Tables = require("./infra/database/tables");
 
 connection.connect((erro) => {
   if (erro) {

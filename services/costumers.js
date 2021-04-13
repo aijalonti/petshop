@@ -16,4 +16,4 @@ app.get("/:cpf", (req, res) => {
   });
 });
 
-app.listen(8082, () => console.log("Api running"));
+app.listen(3232, () => console.log("Api running"));
