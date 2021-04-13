@@ -1,7 +1,6 @@
 const moment = require("moment");
-const attendance = require("../controllers/attendance");
-const connection = require("../infra/bd");
 const axios = require("axios");
+const connection = require("../infra/bd");
 
 class Attendance {
   create(attendance, res) {
@@ -36,11 +35,12 @@ class Attendance {
 
       const sql = "INSERT INTO Attendance SET ?";
 
-      connection.query(sql, attendanceDate, (err) => {
-        if (err) {
-          res.status(400).json(err);
+      connection.query(sql, attendanceDate, (errs, results) => {
+        if (errs) {
+          res.status(400).json(errs);
         } else {
-          res.status(201).json(attendance);
+          const id = results.insertId;
+          res.status(201).json({ ...attendance, id });
         }
       });
     }
@@ -49,9 +49,9 @@ class Attendance {
   list(res) {
     const sql = "SELECT * FROM Attendance";
 
-    connection.query(sql, (err, results) => {
-      if (err) {
-        res.status(400).json(err);
+    connection.query(sql, (errs, results) => {
+      if (errs) {
+        res.status(400).json(errs);
       } else {
         res.status(200).json(results);
       }
@@ -59,14 +59,14 @@ class Attendance {
   }
 
   searchId(id, res) {
-    const sql = `SELECT * FROM Attendance WHERE id=${id}`;
-    connection.query(sql, async (err, result) => {
-      const attendance = result[0];
+    const sql = `SELECT * FROM Atendimentos WHERE id=${id}`;
+    connection.query(sql, async (errs, results) => {
+      const attendance = results[0];
       const cpf = attendance.client;
-      if (err) {
-        res.status(400).json(err);
+      if (errs) {
+        res.status(400).json(errs);
       } else {
-        const { data } = await axios.get(`http//localhost:8082/${cpf}`);
+        const { data } = await axios.get(`http://localhost:8082/${cpf}`);
         attendance.client = data;
         res.status(200).json(attendance);
       }
@@ -81,11 +81,11 @@ class Attendance {
     }
     const sql = "UPDATE Attendance SET ? WHERE id=?";
 
-    connection.query(sql, [values, id], (err) => {
-      if (err) {
-        res.status(400).json(err);
+    connection.query(sql, [values, id], (errs, results) => {
+      if (errs) {
+        res.status(400).json(errs);
       } else {
-        res.status(200).json("Custumer update with sucess ${...values, id}");
+        res.status(200).json({ ...values, id });
       }
     });
   }
@@ -93,8 +93,8 @@ class Attendance {
   delete(id, res) {
     const sql = "DELETE FROM Attendance WHERE id=?";
 
-    connection.query(sql, id, (err) => {
-      if (err) {
+    connection.query(sql, id, (errs, results) => {
+      if (errs) {
         res.status(400).json(erro);
       } else {
         res
