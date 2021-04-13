@@ -1,6 +1,7 @@
 const moment = require("moment");
 const attendance = require("../controllers/attendance");
 const connection = require("../infra/bd");
+const axios = require("axios");
 
 class Attendance {
   create(attendance, res) {
@@ -59,11 +60,14 @@ class Attendance {
 
   searchId(id, res) {
     const sql = `SELECT * FROM Attendance WHERE id=${id}`;
-    connection.query(sql, (err, result) => {
+    connection.query(sql, async (err, result) => {
       const attendance = result[0];
+      const cpf = attendance.client;
       if (err) {
         res.status(400).json(err);
       } else {
+        const { data } = await axios.get(`http//localhost:8082/${cpf}`);
+        attendance.client = data;
         res.status(200).json(attendance);
       }
     });

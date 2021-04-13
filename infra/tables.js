@@ -10,7 +10,7 @@ class Tables {
 
   createAttendance() {
     const query =
-      "CREATE TABLE IF NOT EXISTS Attendance (id int NOT NULL AUTO_INCREMENT, client varchar(50) NOT NULL, pet varchar(20), service varchar(20) NOT NULL, status varchar(20) NOT NULL, comments text, dateService datetime NOT NULL, createAt datetime NOT NULL, PRIMARY KEY(id))";
+      "CREATE TABLE IF NOT EXISTS Attendance (id int NOT NULL AUTO_INCREMENT, client varchar(11) NOT NULL, pet varchar(20), service varchar(20) NOT NULL, status varchar(20) NOT NULL, comments text, dateService datetime NOT NULL, createAt datetime NOT NULL, PRIMARY KEY(id))";
 
     this.connection.query(query, (errs) => {
       if (errs) {
