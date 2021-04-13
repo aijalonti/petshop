@@ -1,69 +1,72 @@
 const moment = require("moment");
-const attendance = require("../controllers/attendance");
-const connection = require("../infra/bd");
+const axios = require("axios");
+const connection = require("../infra/database/bd");
+const repositories = require("../repositories/attendance.repositories");
 
 class Attendance {
-  create(attendance, res) {
+  constructor() {
+    this.validDate = ({ dateService, createAt }) =>
+      moment(dateService).isSameOrAfter(createAt);
+    this.customerValid = (size) => size >= 5;
+    this.valid = (params) =>
+      this.validations.filter((field) => {
+        const { name } = field;
+        const param = params[name];
+
+        return !field.valid(param);
+      });
+    this.validations = [
+      {
+        name: "dateService",
+        valid: this.validDate,
+        mensage: "Date must be greater than or equal to the current datete",
+      },
+      {
+        name: "client",
+        valid: this.customerValid,
+        mensage: "Customer must be at least 5 characters",
+      },
+    ];
+  }
+  create(attendance) {
     const createAt = moment().format("YYYY-MM-DD HH:MM:SS");
     const dateService = moment(attendance.dateService, "DD/MM/YYYY").format(
       "YYYY-MM-DD HH:MM:SS"
     );
 
-    const validDate = moment(dateService).isSameOrAfter(createAt);
-    const customerValid = attendance.client.length >= 5;
-
-    const validations = [
-      {
-        name: "dateService",
-        valid: validDate,
-        mensage: "Date must be greater than or equal to the current datete",
-      },
-      {
-        name: "client",
-        valid: customerValid,
-        mensage: "Customer must be at least 5 characters",
-      },
-    ];
-
-    const errs = validations.filter((field) => !field.valid);
+    const params = {
+      data: { dateService, createAt },
+      client: { size: attendance.client.length },
+    };
+    const errs = this.valid(params);
     const existsErrs = errs.length;
 
     if (existsErrs) {
-      res.status(400).json(errs);
+      return new Promise((resolve, reject) => reject(errs));
     } else {
       const attendanceDate = { ...attendance, createAt, dateService };
 
-      const sql = "INSERT INTO Attendance SET ?";
-
-      connection.query(sql, attendanceDate, (err) => {
-        if (err) {
-          res.status(400).json(err);
-        } else {
-          res.status(201).json(attendance);
-        }
+      return repositories.create(attendanceDate).then((results) => {
+        const id = results.insertId;
+        return { ...attendance, id };
       });
     }
   }
 
-  list(res) {
-    const sql = "SELECT * FROM Attendance";
-
-    connection.query(sql, (err, results) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        res.status(200).json(results);
-      }
-    });
+  list() {
+    return repositories.list();
   }
 
   searchId(id, res) {
     const sql = `SELECT * FROM Attendance WHERE id=${id}`;
-    connection.query(sql, (err, result) => {
-      const attendance = result[0];
-      if (err) {
-        res.status(400).json(err);
+    connection.query(sql, async (errs, results) => {
+      const attendance = results[0];
+      const cpf = attendance.client;
+      if (errs) {
+        res.status(400).json(errs);
       } else {
+        const { data } = await axios.get(`http://localhost:3232/${cpf}`);
+        attendance.client = data;
         res.status(200).json(attendance);
       }
     });
@@ -77,11 +80,11 @@ class Attendance {
     }
     const sql = "UPDATE Attendance SET ? WHERE id=?";
 
-    connection.query(sql, [values, id], (err) => {
-      if (err) {
-        res.status(400).json(err);
+    connection.query(sql, [values, id], (errs, results) => {
+      if (errs) {
+        res.status(400).json(errs);
       } else {
-        res.status(200).json("Custumer update with sucess ${...values, id}");
+        res.status(200).json({ ...values, id });
       }
     });
   }
@@ -89,8 +92,8 @@ class Attendance {
   delete(id, res) {
     const sql = "DELETE FROM Attendance WHERE id=?";
 
-    connection.query(sql, id, (err) => {
-      if (err) {
+    connection.query(sql, id, (errs, results) => {
+      if (errs) {
         res.status(400).json(erro);
       } else {
         res

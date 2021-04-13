@@ -1,5 +1,3 @@
-const { text } = require("body-parser");
-
 class Tables {
   init(connection) {
     this.connection = connection;
@@ -9,10 +7,10 @@ class Tables {
   }
 
   createAttendance() {
-    const query =
-      "CREATE TABLE IF NOT EXISTS Attendance (id int NOT NULL AUTO_INCREMENT, client varchar(50) NOT NULL, pet varchar(20), service varchar(20) NOT NULL, status varchar(20) NOT NULL, comments text, dateService datetime NOT NULL, createAt datetime NOT NULL, PRIMARY KEY(id))";
+    const sql =
+      "CREATE TABLE IF NOT EXISTS Attendance (id int NOT NULL AUTO_INCREMENT, client varchar(11) NOT NULL, pet varchar(20), service varchar(20) NOT NULL, status varchar(20) NOT NULL, comments text, dateService datetime NOT NULL, createAt datetime NOT NULL, PRIMARY KEY(id))";
 
-    this.connection.query(query, (errs) => {
+    this.connection.query(sql, (errs) => {
       if (errs) {
         console.log(errs);
       } else {
@@ -23,9 +21,9 @@ class Tables {
   }
 
   createPets() {
-    const query =
+    const sql =
       "CREATE TABLE IF NOT EXISTS Pets (id int NOT NULL AUTO_INCREMENT, name varchar(50), image varchar(200), PRIMARY KEY (id))";
-    this.connection.query(query, (errs) => {
+    this.connection.query(sql, (errs) => {
       if (errs) {
         console.log(errs);
       } else {

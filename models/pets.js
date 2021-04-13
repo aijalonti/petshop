@@ -1,6 +1,6 @@
 const pets = require("../controllers/pets");
-const connection = require("../infra/bd");
-const uploadOfFiles = require("../files/uploadOfFiles");
+const connection = require("../infra/database/bd");
+const uploadOfFiles = require("../infra/files/uploadOfFiles");
 
 class Pet {
   add(pet, res) {
